@@ -18,6 +18,7 @@ namespace MatchGame
         readonly DispatcherTimer timer = new DispatcherTimer(); //A timer
         int tenthsOfSecondsElapsed; //The number of tenths of seconds that have passed since the timer was started
         int matchesFound; //The number of matches we found
+        int previousBest; //The previously best time achieved this session.
 
         public MainWindow()
         {
@@ -47,6 +48,12 @@ namespace MatchGame
                 //Stop the timer and indicate to the player that they can click to play again.
                 timer.Stop();
                 timeTextBlock.Text += " - Click to play again";
+
+                if (previousBest == 0 || tenthsOfSecondsElapsed < previousBest)
+                {
+                    previousBest = tenthsOfSecondsElapsed;
+                    personalBestTextBlock.Text = "Personal Best: " + (previousBest / 10F).ToString("0.0s");
+                }
             }
         }
 
@@ -72,7 +79,7 @@ namespace MatchGame
             //For each text block whose name is not 'timeTextBlock'.
             foreach (TextBlock textBlock in 
                 mainGrid.Children.OfType<TextBlock>()
-                .Where((textBlock) => textBlock.Name != "timeTextBlock"))
+                .Where((textBlock) => textBlock.Name != "timeTextBlock" && textBlock.Name != "personalBestTextBlock"))
             {
                 //Get a random index of the emoji list and retrieve its emoji
                 int index = random.Next(animalEmojis.Count);
@@ -137,7 +144,8 @@ namespace MatchGame
         private void TimeTextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (matchesFound == 8)
-                SetUpGame();
+               SetUpGame();
+                
         }
     }
 }
